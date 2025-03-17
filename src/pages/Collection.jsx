@@ -1,6 +1,6 @@
 import React, { use, useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../context/ShopContext'
-import { assets } from '../assets/assets';
+import { assets, products } from '../assets/assets';
 import Title from '../components/Title'
 import ProductItem from '../components/ProductItem';
 
@@ -10,14 +10,34 @@ const Collection = () => {
   const [showFilter,setShowFilter] = useState(false);
   const [filterProducts,setFilterProducts] = useState([]);
   const [category,setCategory] = useState([]);
-  const [Subcategory,setSubcategory] = useState([]);
+  const [subCategory,setSubCategory] = useState([]);
 
   const toggleCategory = (e)=>{
-    if (category.includes(e.target.value)) {
+    if(category.includes(e.target.value)) {
         setCategory(prev => prev.filter(item => item !== e.target.value))
     }else{
       setCategory(prev=> [...prev,e.target.value])
     }
+  }
+  const toggleSubCatogery = (e)=>{
+    if(subCategory.includes(e.target.value)){
+      setSubCategory(prev => prev.filter(item => item !== e.target.value))
+    }else{
+      setSubCategory(prev=> [...prev,e.target.value])
+    }
+  }
+
+  const applyFilter = ()=>{
+    let productsCopy = products.slice();
+
+    if(category.length > 0 ){
+      productsCopy = productsCopy.filter(item => category.includes(item.category))
+    }
+    if(subCategory.length > 0){
+      productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory));
+    }
+    setFilterProducts(productsCopy);  
+    console.log(productsCopy)
   }
 
 
@@ -25,10 +45,13 @@ const Collection = () => {
     setFilterProducts(products);
   },[])
 
+  
   useEffect(()=>{
-    console.log(category)
-  },[category])
-
+    applyFilter();
+  },[category,subCategory])
+  // console.log("catogery" , category)
+  // console.log("subcatogery" , subCategory)
+  
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
       {/* FILTER */}
@@ -54,18 +77,18 @@ const Collection = () => {
             </p>
           </div>
         </div>
-        {/*Subcategory filter*/}
+        {/*subCategory filter*/}
         <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '': 'hidden'} sm:block`}>
           <p className='mb-3 text-sm font-medium '>Type</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2 '>
-              <input className='w-3' type="checkbox" value={'TopWear'}/>TopWear
+              <input className='w-3' type="checkbox" value={'Topwear'} onChange={toggleSubCatogery}/>TopWear
             </p>
             <p className='flex gap-2 '>
-              <input className='w-3' type="checkbox" value={'BottomWear'}/>BottomWear
+              <input className='w-3' type="checkbox" value={'Bottomwear'} onChange={toggleSubCatogery}/>BottomWear
             </p>
             <p className='flex gap-2 '>
-              <input className='w-3' type="checkbox" value={'WinterWear'}/>WinterWear
+              <input className='w-3' type="checkbox" value={'Winterwear'} onChange={toggleSubCatogery}/>WinterWear
             </p>
           </div>
         </div>
