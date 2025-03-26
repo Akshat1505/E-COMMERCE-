@@ -1,7 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { products } from "../assets/assets";
-import { useSearchParams } from "react-router-dom";
-
+import { toast } from "react-toastify";
 export const ShopContext = createContext();
 
 const ShopContextProvider = ({children})=>{
@@ -12,20 +11,55 @@ const [showSearch , setShowSearch] = useState(false);
 const [cartItems,setcartItems] = useState({});
 
     const addToCart = async (itemId,size)=>{
+
+        if (!size) {
+                toast.error('Select Product Size!');
+                return;
+        }
         let cartData = structuredClone(cartItems);
 
-        if(cartData(itemId)){
-            if(cartData[cartItems][size]){
-                cartData[cartItems][size]++;
+        if(cartData[itemId]){
+            if(cartData[itemId][size]){
+                cartData[itemId][size] += 1;
             }else{
-                cartData[cartItems][size] = 1;
+                cartData[itemId][size] = 1;
+            }
+        }else{
+            cartData[itemId] = {};
+            cartData[itemId][size] = 1;
+
+        }
+        setcartItems(cartData)
+    }
+
+    const getCartCount = ()=>{
+        let totalCount = 0;
+        for(const items in cartItems){
+            for(const item in cartItems[items]){
+                try {
+                        if (cartItems[items][item] > 0) {
+                            totalCount += cartItems[items][item];
+                        }
+                } catch (error) {
+                    
+                }
             }
         }
+        return totalCount;
+    }
+
+    const updateQuant = async (itemId,size,quantity)=>{
+            let cartData =  structuredClone(cartItems);
+
+            cartData[itemId][size] = quantity;
+
+            setcartItems(cartData);
     }
 
     const value = {
         products , currency , delivery_fee,
-        search,setSearch,showSearch,setShowSearch
+        search,setSearch,showSearch,setShowSearch,
+        cartItems,addToCart , getCartCount , updateQuant
     }
 
     return (
